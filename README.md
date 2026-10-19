@@ -40,8 +40,8 @@ As rotas de treinos e remadas têm modelos distintos. A verificação de login a
 Requisitos: **JDK 21**, Git e PostgreSQL. O Maven Wrapper está incluído; o primeiro uso precisa de acesso à internet para baixar dependências.
 
 ```powershell
-git clone https://github.com/LucasSMFerreira/Data-Remo.git
-cd Data-Remo
+git clone https://github.com/LucasSMFerreira/data-remo-api.git
+cd data-remo-api
 java -version
 ```
 
