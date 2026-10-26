@@ -1,0 +1,257 @@
+<!-- dashboard.html — Home do atleta logado -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Data-Remo – Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #050814;
+      color: #e0e6f0;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .brand-title { font-size: 1.3rem; color: #4fc3f7; font-weight: 700; }
+    .brand-sub { font-size: 0.8rem; color: #7a8fa6; }
+
+    .user-info {
+      text-align: right;
+      font-size: 0.85rem;
+      color: #9fb3c8;
+    }
+    .user-info strong { color: #e0e6f0; }
+
+    .btn-logout {
+      margin-top: 4px;
+      background: none;
+      border: 1px solid #2a3a54;
+      color: #7a8fa6;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    .btn-logout:hover { border-color: #f44336; color: #f44336; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr);
+      gap: 20px;
+    }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: #111729;
+      border-radius: 16px;
+      padding: 20px 20px 18px;
+    }
+    .card h2 {
+      font-size: 1rem;
+      color: #e0e6f0;
+      margin-bottom: 8px;
+    }
+    .card p {
+      font-size: 0.85rem;
+      color: #7a8fa6;
+      margin-bottom: 16px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .btn-main {
+      flex: 1 1 180px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #4fc3f7;
+      color: #050814;
+    }
+    .btn-main.secondary {
+      background: #1f2937;
+      color: #e0e6f0;
+      border: 1px solid #2a3a54;
+    }
+    .btn-main:hover { opacity: 0.9; }
+
+    .stats-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .stat {
+      flex: 1 1 120px;
+      background: #050814;
+      border-radius: 12px;
+      padding: 10px 12px;
+      border: 1px solid #1f2937;
+      font-size: 0.8rem;
+    }
+    .stat-label { color: #7a8fa6; margin-bottom: 4px; }
+    .stat-value { font-size: 1rem; font-weight: 600; }
+
+    .levels-list {
+      list-style: none;
+      font-size: 0.8rem;
+      color: #9fb3c8;
+      margin-top: 8px;
+    }
+    .levels-list li {
+      margin-bottom: 4px;
+    }
+    .levels-list span {
+      color: #4fc3f7;
+      font-weight: 600;
+    }
+
+    a.link {
+      color: #4fc3f7;
+      font-size: 0.85rem;
+      text-decoration: none;
+    }
+    a.link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-title">🚣 Data-Remo</div>
+      <div class="brand-sub">Painel do atleta</div>
+    </div>
+    <div class="user-info">
+      <div><strong id="u-nome"></strong></div>
+      <div id="u-email"></div>
+      <div id="u-plano"></div>
+      <button class="btn-logout" onclick="logout()">Sair</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- Coluna esquerda: ações -->
+    <div class="card">
+      <h2>Dashboard</h2>
+      <p>Centralize aqui o seu dia de treino. Escolha abaixo o que deseja fazer.</p>
+
+      <div class="actions">
+        <button class="btn-main secondary" onclick="irPara('telemetria.html')">Telemetria do hardware · simulação</button>
+        <button class="btn-main" onclick="irPara('registrar-remada.html')">
+          ⏱ Registrar remada
+        </button>
+        <button class="btn-main secondary" onclick="irPara('ranking.html')">
+          🏆 Ver ranking
+        </button>
+        <button class="btn-main secondary" onclick="irPara('atletas.html')">
+          👤 Gerenciar atletas
+        </button>
+        <button class="btn-main secondary" onclick="irPara('perfil.html')">Ver perfil e conquistas</button>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-label">Nível atual</div>
+          <div class="stat-value" id="s-nivel">INICIANTE 1</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Treinos totais</div>
+          <div class="stat-value" id="s-treinos">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Pontuação</div>
+          <div class="stat-value" id="s-pontos">0 pts</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coluna direita: níveis / bonificação -->
+    <div class="card">
+      <h2>Sistema de níveis e bonificação</h2>
+      <p>Conquiste pontos a cada remada registrada e suba de nível no ranking.</p>
+      <ul class="levels-list">
+        <li>Iniciante 2: 50 pontos, 5 treinos e 150 minutos</li>
+        <li>Iniciante 3: 120 pontos, 10 treinos e 350 minutos</li>
+        <li>Intermediário 1: 250 pontos, 20 treinos e 700 minutos</li>
+        <li>Avançado 1: 1.000 pontos, 80 treinos e 3.000 minutos</li>
+      </ul><p>O avanço exige cumprir pontos, quantidade de treinos e tempo acumulado.</p>
+      <p style="margin-top:10px;">
+        Veja detalhes no <a href="ranking.html" class="link">ranking geral</a> e acompanhe sua evolução.
+      </p>
+    </div>
+  </div>
+
+  <div class="card" style="margin:24px auto;max-width:1100px"><h2>Histórico de treinos</h2><div id="historico">Carregando...</div></div>
+  <script>
+    function irPara(pagina) {
+      window.location.href = pagina;
+    }
+
+    function logout() {
+      localStorage.removeItem('atletaLogado');
+      window.location.href = 'index.html';
+    }
+
+    // carrega dados do atleta
+    window.addEventListener('DOMContentLoaded', async () => {
+      const raw = localStorage.getItem('atletaLogado');
+      if (!raw) {
+        // se não estiver logado, volta pro login
+        window.location.href = 'index.html';
+        return;
+      }
+      try {
+        let atleta = JSON.parse(raw);
+        const response = await fetch(`/api/atletas/${atleta.id}`);
+        if (!response.ok) throw new Error('Atleta indisponivel');
+        atleta = await response.json();
+        localStorage.setItem('atletaLogado', JSON.stringify(atleta));
+        const treinos = await fetch(`/api/treinos/atleta/${atleta.id}`).then(r => r.json());
+        const destino = document.getElementById('historico');
+        destino.replaceChildren();
+        if (!treinos.length) destino.textContent = 'Nenhum treino registrado. Use Registrar remada para começar.';
+        for (const treino of treinos) {
+          const linha=document.createElement('p');linha.style.padding='12px 0';linha.style.borderBottom='1px solid #2a3a54';
+          linha.textContent=`${treino.data.split('-').reverse().join('/')} — ${treino.duracaoMinutos} min — ${treino.distanciaKm} km — ${treino.intensidade} — ${treino.pontosTreino.toFixed(1)} pontos`;
+          destino.appendChild(linha);
+        }
+        document.getElementById('u-nome').textContent  = atleta.nome || '';
+        document.getElementById('u-email').textContent = atleta.email || '';
+        document.getElementById('u-plano').textContent = atleta.plano ? `Plano: ${atleta.plano}` : '';
+
+        // esses campos ainda são fake até você ter treino no backend
+        document.getElementById('s-nivel').textContent   = (atleta.nivel || 'INICIANTE_1').replace('_',' ');
+        document.getElementById('s-treinos').textContent = atleta.totalTreinos || 0;
+        document.getElementById('s-pontos').textContent  = (atleta.pontosTotais || 0) + ' pts';
+      } catch (e) {
+        console.error('Erro ao ler atletaLogado', e);
+        window.location.href = 'index.html';
+      }
+    });
+  </script>
+</body>
+</html>

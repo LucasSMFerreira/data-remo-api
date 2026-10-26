@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Data-Remo – Acesso</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0a0e1a;
+      color: #e0e6f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: #1a2236;
+      border-radius: 20px;
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 440px;
+    }
+    .logo { font-size: 2rem; font-weight: 800; color: #4fc3f7; letter-spacing: 2px; margin-bottom: 6px; }
+    .sub { color: #7a8fa6; font-size: 0.9rem; margin-bottom: 32px; }
+
+    .tabs { display: flex; gap: 8px; margin-bottom: 28px; }
+    .tab {
+      flex: 1; padding: 10px; text-align: center;
+      border-radius: 8px; cursor: pointer;
+      font-weight: 600; font-size: 0.9rem;
+      border: 1px solid #2a3a54; color: #7a8fa6;
+      background: transparent; transition: 0.2s;
+    }
+    .tab.active { background: #4fc3f7; color: #0a0e1a; border-color: #4fc3f7; }
+
+    .field { margin-bottom: 18px; }
+    label {
+      display: block; font-size: 0.8rem; color: #7a8fa6;
+      margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    input, select {
+      width: 100%; padding: 12px 14px;
+      background: #0a0e1a; border: 1px solid #2a3a54;
+      border-radius: 8px; color: #e0e6f0; font-size: 0.95rem;
+    }
+    input:focus, select:focus { outline: none; border-color: #4fc3f7; }
+
+    .senha-wrap { position: relative; }
+    .senha-wrap input { padding-right: 44px; }
+    .olho {
+      position: absolute; right: 12px; top: 50%;
+      transform: translateY(-50%); background: none;
+      border: none; cursor: pointer; color: #7a8fa6; font-size: 1rem;
+    }
+
+    .btn {
+      width: 100%; padding: 14px;
+      background: #4fc3f7; color: #0a0e1a;
+      border: none; border-radius: 10px;
+      font-size: 1rem; font-weight: 700; cursor: pointer;
+      margin-top: 4px;
+    }
+    .btn:hover { opacity: 0.85; }
+
+    .link-esqueci {
+      display: block; text-align: center; margin-top: 14px;
+      color: #4fc3f7; font-size: 0.85rem; cursor: pointer;
+      background: none; border: none; width: 100%;
+    }
+    .link-esqueci:hover { text-decoration: underline; }
+
+    .msg {
+      margin-top: 14px; padding: 12px;
+      border-radius: 8px; font-size: 0.9rem;
+      display: none; text-align: center;
+    }
+    .msg.ok { background: #0d3b2e; color: #4caf50; display: block; }
+    .msg.err { background: #3b0d0d; color: #f44336; display: block; }
+
+    .form-section { display: none; }
+    .form-section.active { display: block; }
+
+    .divider { border: none; border-top: 1px solid #2a3a54; margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">🚣 Data-Remo</div>
+    <div class="sub">Sistema de Análise e Registro de Remadas</div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="trocarAba('cadastro')">Cadastrar</button>
+      <button class="tab" onclick="trocarAba('entrar')">Entrar</button>
+    </div>
+
+    <!-- CADASTRO -->
+    <div class="form-section active" id="form-cadastro">
+      <div class="field"><label>Nome completo</label><input id="c-nome" type="text" placeholder="Ex: Lucas Martins"/></div>
+      <div class="field"><label>Idade</label><input id="c-idade" type="number" placeholder="Ex: 24"/></div>
+      <div class="field"><label>Clube / Objetivo</label><input id="c-clube" type="text" placeholder="Ex: Clube de Remo SP"/></div>
+      <div class="field"><label>Email</label><input id="c-email" type="email" placeholder="seu@email.com"/></div>
+      <div class="field">
+        <label>Modalidade</label>
+        <select id="c-modalidade">
+          <option value="Remo">Remo</option>
+          <option value="Canoagem">Canoagem</option>
+          <option value="Kayak">Kayak</option>
+          <option value="Stand Up Paddle">Stand Up Paddle</option>
+        </select>
+      </div>
+      <hr class="divider"/>
+      <div class="field">
+        <label>Senha</label>
+        <div class="senha-wrap">
+          <input id="c-senha" type="password" placeholder="Mínimo 6 caracteres"/>
+          <button class="olho" type="button" onclick="toggleSenha('c-senha', this)">👁️</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Confirmar senha</label>
+        <div class="senha-wrap">
+          <input id="c-senha2" type="password" placeholder="Repita a senha"/>
+          <button class="olho" type="button" onclick="toggleSenha('c-senha2', this)">👁️</button>
+        </div>
+      </div>
+      <button class="btn" onclick="cadastrar()">Criar conta</button>
+    </div>
+
+    <!-- ENTRAR -->
+    <div class="form-section" id="form-entrar">
+      <div class="field"><label>Nome</label><input id="e-nome" type="text" placeholder="Seu nome cadastrado"/></div>
+      <div class="field">
+        <label>Senha</label>
+        <div class="senha-wrap">
+          <input id="e-senha" type="password" placeholder="Sua senha"/>
+          <button class="olho" type="button" onclick="toggleSenha('e-senha', this)">👁️</button>
+        </div>
+      </div>
+      <button class="btn" onclick="entrar()">Entrar</button>
+      <button class="link-esqueci" type="button" onclick="trocarAba('esqueci')">Esqueci minha senha</button>
+    </div>
+
+    <!-- ESQUECI A SENHA -->
+    <div class="form-section" id="form-esqueci">
+      <p style="color:#7a8fa6; font-size:0.88rem; margin-bottom:20px; line-height:1.6;">
+        A recuperação por email ainda não está disponível neste protótipo. Nenhuma mensagem será enviada.
+      </p>
+      <div class="field"><label>Nome</label><input id="r-nome" type="text" placeholder="Seu nome cadastrado"/></div>
+      <div class="field"><label>Email cadastrado</label><input id="r-email" type="email" placeholder="seu@email.com"/></div>
+      <button class="btn" type="button" onclick="recuperar()">Enviar instruções</button>
+      <button class="link-esqueci" type="button" onclick="trocarAba('entrar')">← Voltar ao login</button>
+    </div>
+
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <!-- Carrega a constante API -->
+  <script src="js/api.js"></script>
+
+  <!-- Lógica da página -->
+  <script>
+    function trocarAba(aba) {
+      document.getElementById('form-cadastro').classList.remove('active');
+      document.getElementById('form-entrar').classList.remove('active');
+      document.getElementById('form-esqueci').classList.remove('active');
+
+      document.getElementById('form-' + aba).classList.add('active');
+
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      if (aba === 'cadastro') {
+        document.querySelector('.tab:nth-child(1)').classList.add('active');
+      } else if (aba === 'entrar') {
+        document.querySelector('.tab:nth-child(2)').classList.add('active');
+      }
+
+      document.getElementById('msg').className = 'msg';
+    }
+
+    function toggleSenha(id, btn) {
+      const input = document.getElementById(id);
+      const visivel = input.type === 'text';
+      input.type = visivel ? 'password' : 'text';
+      btn.textContent = visivel ? '👁️' : '🙈';
+    }
+
+    function showMsg(txt, tipo) {
+      const el = document.getElementById('msg');
+      el.textContent = txt;
+      el.className = 'msg ' + tipo;
+    }
+
+    async function cadastrar() {
+      const nome    = document.getElementById('c-nome').value.trim();
+      const idade   = parseInt(document.getElementById('c-idade').value);
+      const clube   = document.getElementById('c-clube').value.trim();
+      const email   = document.getElementById('c-email').value.trim();
+      const modalidade = document.getElementById('c-modalidade').value;
+      const plano   = 'FREE';
+      const senha   = document.getElementById('c-senha').value;
+      const senha2  = document.getElementById('c-senha2').value;
+
+      if (!nome || !idade || !clube || !email || !senha || !senha2) {
+        return showMsg('Preencha todos os campos.', 'err');
+      }
+      if (!Number.isInteger(idade) || idade < 1 || idade > 120) return showMsg('Informe uma idade entre 1 e 120 anos.', 'err');
+      if (!document.getElementById('c-email').checkValidity()) return showMsg('Informe um email válido.', 'err');
+      if (senha.length < 6) {
+        return showMsg('A senha deve ter pelo menos 6 caracteres.', 'err');
+      }
+      if (senha !== senha2) {
+        return showMsg('As senhas não coincidem.', 'err');
+      }
+
+      const payload = {
+        nome,
+        idade,
+        modalidade,
+        objetivo: clube,   // reaproveitando campo "clube" como objetivo
+        plano,
+        altura: 0,
+        email,
+        senha
+      };
+
+
+
+      try {
+        const res = await fetch(`${API}/api/atletas`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const texto = await res.text();
+        if (!res.ok) {
+          console.error('Resposta backend:', res.status, texto);
+          throw new Error(texto || 'Erro ao criar conta');
+        }
+
+        const atleta = JSON.parse(texto);
+        localStorage.setItem('atletaLogado', JSON.stringify(atleta));
+
+        showMsg('Conta criada! Redirecionando...', 'ok');
+        setTimeout(() => window.location.href = 'dashboard.html', 1200);
+      } catch (error) {
+        console.error('Erro ao criar conta:', error);
+        // usa a mensagem exata do backend, se vier
+        showMsg(error.message || 'Erro ao criar conta. Verifique se o nome ou email já estão em uso.', 'err');
+      }
+    }
+
+    async function entrar() {
+      const nome  = document.getElementById('e-nome').value.trim();
+      const senha = document.getElementById('e-senha').value;
+
+      if (!nome || !senha) return showMsg('Preencha nome e senha.', 'err');
+
+      try {
+        const res = await fetch(`${API}/api/atletas/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome, senha })
+        });
+
+        const texto = await res.text();
+        if (res.status === 401) {
+          return showMsg('Nome ou senha incorretos.', 'err');
+        }
+        if (!res.ok) {
+          console.error('Resposta backend login:', res.status, texto);
+          throw new Error(texto || 'Erro ao entrar');
+        }
+
+        const atleta = JSON.parse(texto);
+        localStorage.setItem('atletaLogado', JSON.stringify(atleta));
+
+        showMsg('Bem-vindo! Redirecionando...', 'ok');
+        setTimeout(() => window.location.href = 'dashboard.html', 1200);
+      } catch (error) {
+        console.error('Erro ao entrar:', error);
+        showMsg('Erro ao entrar. Tente novamente.', 'err');
+      }
+    }
+
+    async function recuperar() {
+      const nome  = document.getElementById('r-nome').value.trim();
+      const email = document.getElementById('r-email').value.trim();
+
+      if (!nome || !email) return showMsg('Preencha nome e email.', 'err');
+
+      try {
+        const res = await fetch(`${API}/api/atletas`);
+        const atletas = await res.json();
+        const atleta = atletas.find(a =>
+          a.nome.toLowerCase() === nome.toLowerCase() && a.email === email
+        );
+
+        if (!atleta) return showMsg('Nenhuma conta encontrada com esses dados.', 'err');
+
+        showMsg('Envio de email ainda não implementado nesta versão. Nenhuma mensagem foi enviada.', 'err');
+      } catch (error) {
+        console.error('Erro ao recuperar senha:', error);
+        showMsg('Erro ao verificar conta para recuperação.', 'err');
+      }
+    }
+  </script>
+</body>
+</html>

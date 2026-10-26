@@ -9,4 +9,6 @@ import java.util.List;
 public interface TreinoRepository extends JpaRepository<Treino, Long> {
 
     List<Treino> findByAtleta(Atleta atleta);
+
+    List<Treino> findByAtletaIdOrderByDataDescIdDesc(Long atletaId);
 }

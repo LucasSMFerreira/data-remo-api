@@ -1,0 +1,123 @@
+<!-- atletas.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cadastrar Atleta – Data-Remo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0a0e1a; color: #e0e6f0; min-height: 100vh; padding: 40px 20px; }
+    .container { max-width: 520px; margin: 0 auto; }
+    .back { color: #4fc3f7; text-decoration: none; font-size: 0.9rem; display: inline-block; margin-bottom: 24px; }
+    h1 { font-size: 1.8rem; color: #4fc3f7; margin-bottom: 32px; }
+    .card { background: #1a2236; border-radius: 16px; padding: 32px; }
+    .field { margin-bottom: 20px; }
+    label { display: block; font-size: 0.85rem; color: #7a8fa6; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    input, select {
+      width: 100%; padding: 12px 16px; background: #0a0e1a;
+      border: 1px solid #2a3a54; border-radius: 8px; color: #e0e6f0;
+      font-size: 1rem; transition: border-color 0.2s;
+    }
+    input:focus, select:focus { outline: none; border-color: #4fc3f7; }
+    .btn {
+      width: 100%; padding: 14px; background: #4fc3f7; color: #0a0e1a;
+      border: none; border-radius: 10px; font-size: 1rem; font-weight: 700;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .msg { margin-top: 16px; padding: 12px 16px; border-radius: 8px; font-size: 0.95rem; display: none; }
+    .msg.ok { background: #0d3b2e; color: #4caf50; display: block; }
+    .msg.err { background: #3b0d0d; color: #f44336; display: block; }
+    .lista { margin-top: 32px; }
+    .lista h2 { font-size: 1.1rem; color: #7a8fa6; margin-bottom: 16px; }
+    .atleta-card {
+      background: #0a0e1a; border: 1px solid #2a3a54; border-radius: 10px;
+      padding: 14px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .atleta-nome { font-weight: 600; }
+    .atleta-info { font-size: 0.82rem; color: #7a8fa6; margin-top: 2px; }
+    .badge-nivel { font-size: 0.78rem; background: #2a3a54; padding: 4px 10px; border-radius: 20px; color: #4fc3f7; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- VOLTAR para a home do atleta -->
+    <a href="dashboard.html" class="back">← Voltar</a>
+
+    <h1>Cadastrar Atleta</h1>
+    <div class="card">
+      <div class="field"><label>Nome</label><input id="nome" type="text" placeholder="Nome completo"/></div>
+      <div class="field"><label>Idade</label><input id="idade" type="number" placeholder="Ex: 22"/></div>
+      <div class="field"><label>Altura (m)</label><input id="altura" type="number" step="0.01" placeholder="Ex: 1.80"/></div>
+      <div class="field"><label>Modalidade</label><input id="modalidade" type="text" placeholder="Ex: Remo Indoor"/></div>
+      <div class="field"><label>Objetivo</label><input id="objetivo" type="text" placeholder="Ex: Competição"/></div>
+      <div class="field">
+        <label>Plano</label>
+        <select id="plano">
+          <option value="FREE">FREE</option>
+          <option value="PLUS">PLUS</option>
+        </select>
+      </div>
+      <div class="field"><label>Email</label><input id="email" type="email" placeholder="atleta@exemplo.com"/></div>
+      <div class="field"><label>Senha de acesso</label><input id="senha" type="password" placeholder="Minimo 6 caracteres"/></div>
+      <button class="btn" onclick="cadastrar()">Cadastrar</button>
+      <div class="msg" id="msg"></div>
+    </div>
+
+    <div class="lista">
+      <h2>Atletas cadastrados</h2>
+      <div id="lista-atletas"></div>
+    </div>
+  </div>
+
+  <script>
+    const API = '';
+
+    async function cadastrar() {
+      const body = {
+        nome: document.getElementById('nome').value,
+        idade: parseInt(document.getElementById('idade').value),
+        altura: parseFloat(document.getElementById('altura').value),
+        modalidade: document.getElementById('modalidade').value,
+        objetivo: document.getElementById('objetivo').value,
+        plano: document.getElementById('plano').value,
+        email: document.getElementById('email').value,
+        senha: document.getElementById('senha').value
+      };
+      try {
+        const res = await fetch(`${API}/api/atletas`, {
+          method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)
+        });
+        if (!res.ok) throw new Error();
+        showMsg('Atleta cadastrado com sucesso!', 'ok');
+        carregarAtletas();
+      } catch {
+        showMsg('Erro ao cadastrar atleta.', 'err');
+      }
+    }
+
+    function showMsg(txt, tipo) {
+      const el = document.getElementById('msg');
+      el.textContent = txt; el.className = 'msg ' + tipo;
+    }
+
+    async function carregarAtletas() {
+      const res = await fetch(`${API}/api/atletas`);
+      const atletas = await res.json();
+      const el = document.getElementById('lista-atletas');
+      el.innerHTML = atletas.map(a => `
+        <div class="atleta-card">
+          <div>
+            <div class="atleta-nome">${a.nome}</div>
+            <div class="atleta-info">${a.modalidade} · ${a.plano}</div>
+          </div>
+          <span class="badge-nivel">${(a.nivel || '').replace('_', ' ')}</span>
+        </div>
+      `).join('');
+    }
+
+    carregarAtletas();
+  </script>
+</body>
+</html>

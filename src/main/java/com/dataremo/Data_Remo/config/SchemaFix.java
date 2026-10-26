@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
+@org.springframework.boot.sql.init.dependency.DependsOnDatabaseInitialization
 public class SchemaFix {
 
     private final JdbcTemplate jdbcTemplate;

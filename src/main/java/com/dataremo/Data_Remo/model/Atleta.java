@@ -23,6 +23,7 @@ public class Atleta {
     private String plano;
 
     private String email;
+    @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY)
     private String senha;
 
     @Enumerated(EnumType.STRING)
@@ -43,6 +44,7 @@ public class Atleta {
     @Column(name = "badge")
     private List<String> badges = new ArrayList<>();
 
+    @com.fasterxml.jackson.annotation.JsonCreator
     public Atleta() {
     }
 

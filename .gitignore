@@ -35,3 +35,5 @@ build/
 ### Secrets ###
 src/main/resources/application.properties
 *.exe
+# Credenciais locais do ESP32
+hardware/**/secrets.h

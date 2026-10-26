@@ -1,0 +1,320 @@
+<!-- registrar-remada.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Data-Remo – Registrar remada</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0a0e1a;
+      color: #e0e6f0;
+      min-height: 100vh;
+      padding: 32px 20px;
+    }
+    .container { max-width: 640px; margin: 0 auto; }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .brand-title { font-size: 1.3rem; color: #4fc3f7; font-weight: 700; }
+    .brand-sub { font-size: 0.85rem; color: #7a8fa6; }
+
+    .back {
+      color: #4fc3f7;
+      text-decoration: none;
+      font-size: 0.9rem;
+      display: inline-block;
+      margin-bottom: 16px;
+    }
+    .back:hover { text-decoration: underline; }
+
+    h1 {
+      font-size: 1.6rem;
+      color: #e0e6f0;
+      margin-bottom: 8px;
+    }
+    .descricao {
+      font-size: 0.9rem;
+      color: #7a8fa6;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: #1a2236;
+      border-radius: 16px;
+      padding: 24px 22px;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: #7a8fa6;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    input, select {
+      width: 100%;
+      padding: 11px 14px;
+      background: #0a0e1a;
+      border: 1px solid #2a3a54;
+      border-radius: 8px;
+      color: #e0e6f0;
+      font-size: 0.95rem;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #4fc3f7;
+    }
+
+    .inline-fields {
+      display: flex;
+      gap: 12px;
+    }
+    .inline-fields .field {
+      flex: 1;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 13px;
+      background: #4fc3f7;
+      color: #0a0e1a;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+    .btn:hover { opacity: 0.85; }
+
+    .msg {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      display: none;
+    }
+    .msg.ok {
+      background: #0d3b2e;
+      color: #4caf50;
+      display: block;
+    }
+    .msg.err {
+      background: #3b0d0d;
+      color: #f44336;
+      display: block;
+    }
+
+    .resumo {
+      margin-top: 22px;
+      font-size: 0.85rem;
+      color: #9fb3c8;
+    }
+    .resumo strong { color: #e0e6f0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <div>
+        <div class="brand-title">🚣 Data-Remo</div>
+        <div class="brand-sub">Registrar remada</div>
+      </div>
+      <div style="text-align:right; font-size:0.85rem; color:#9fb3c8;">
+        <div id="u-nome"></div>
+        <div id="u-nivel"></div>
+      </div>
+    </div>
+
+    <!-- Voltar para o Dashboard -->
+    <a href="dashboard.html" class="back">← Voltar</a>
+
+    <h1>Registrar remada</h1>
+    <p class="descricao">
+      Preencha os dados da remada realizada. Essas informações serão usadas para calcular sua
+      pontuação, atualizar o ranking e o seu nível.
+    </p>
+
+    <div class="card">
+      <div class="field">
+        <label>Data</label>
+        <input id="data" type="date"/>
+      </div>
+
+      <div class="inline-fields">
+        <div class="field">
+          <label>Duração (min)</label>
+          <input id="duracao" type="number" min="1" placeholder="Ex: 30"/>
+        </div>
+        <div class="field">
+          <label>Distância (km)</label>
+          <input id="distancia" type="number" step="0.01" min="0" placeholder="Ex: 5.2"/>
+        </div>
+      </div>
+
+      <div class="inline-fields">
+        <div class="field">
+          <label>Intensidade</label>
+          <select id="intensidade">
+            <option value="LEVE">Leve</option>
+            <option value="MODERADA">Moderada</option>
+            <option value="INTENSA">Intensa</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tipo de treino</label>
+          <select id="tipo">
+            <option value="BASE">Base / contínuo</option>
+            <option value="INTERVALADO">Intervalado</option>
+            <option value="PROVA">Simulação de prova</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Notas sobre o treino (opcional)</label>
+        <input id="notas" maxlength="500" type="text" placeholder="Ex: vento frontal, foco em cadência"/>
+      </div>
+
+      <button class="btn" onclick="registrarRemada()">
+        Salvar remada
+      </button>
+
+      <div class="msg" id="msg"></div>
+
+      <div class="resumo" id="resumo">
+        <!-- preenchido via JS após salvar -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = '';
+    const TREINOS_API = `${API}/api/treinos`; // ajuste aqui se seu endpoint for diferente
+
+    function showMsg(texto, tipo) {
+      const el = document.getElementById('msg');
+      el.textContent = texto;
+      el.className = 'msg ' + tipo;
+    }
+
+    function preencherUsuario() {
+      const raw = localStorage.getItem('atletaLogado');
+      if (!raw) {
+        // se não estiver logado, volta para login
+        window.location.href = 'index.html';
+        return;
+      }
+      try {
+        const atleta = JSON.parse(raw);
+        document.getElementById('u-nome').textContent = atleta.nome || '';
+        const nivel = (atleta.nivel || 'INICIANTE_1').replace('_', ' ');
+        document.getElementById('u-nivel').textContent = `Nível: ${nivel}`;
+      } catch (e) {
+        console.error('Erro ao ler atletaLogado', e);
+        window.location.href = 'index.html';
+      }
+    }
+
+    async function registrarRemada() {
+      const rawAtleta = localStorage.getItem('atletaLogado');
+      if (!rawAtleta) {
+        showMsg('Sessão expirada. Faça login novamente.', 'err');
+        setTimeout(() => window.location.href = 'index.html', 1500);
+        return;
+      }
+
+      let atleta;
+      try {
+        atleta = JSON.parse(rawAtleta);
+      } catch (e) {
+        console.error('Erro ao parsear atletaLogado', e);
+        showMsg('Erro com os dados do atleta. Faça login novamente.', 'err');
+        return;
+      }
+
+      const data       = document.getElementById('data').value;
+      const duracao    = Number(document.getElementById('duracao').value);
+      const distancia  = parseFloat(document.getElementById('distancia').value);
+      const intensidade= document.getElementById('intensidade').value;
+      const tipo       = document.getElementById('tipo').value;
+      const notas      = document.getElementById('notas').value.trim();
+
+      if (!data || !Number.isInteger(duracao) || duracao <= 0 || !Number.isFinite(distancia) || distancia <= 0) {
+        showMsg('Informe data, duração e distância maiores que zero.', 'err');
+        return;
+      }
+
+      const treino = {
+        atletaId: atleta.id || atleta.atletaId, // ajuste conforme seu modelo
+        data,
+        duracaoMinutos: duracao,
+        distanciaKm: distancia,
+        intensidade,
+        tipo,
+        notas
+      };
+
+      try {
+        const res = await fetch(TREINOS_API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(treino)
+        });
+
+        if (!res.ok) {
+          const txt = await res.text();
+          console.error('Erro ao registrar remada:', res.status, txt);
+          showMsg(res.status === 400 ? 'Revise data, duração inteira, distância, intensidade, tipo e notas (até 500 caracteres).' : 'Não foi possível salvar. Confira se o atleta existe e tente novamente.', 'err');
+          return;
+        }
+
+        const salvo = await res.json();
+        const atualizado = await fetch(`/api/atletas/${treino.atletaId}`).then(r => r.json());
+        localStorage.setItem('atletaLogado', JSON.stringify(atualizado));
+        showMsg('Remada registrada com sucesso!', 'ok');
+
+        // Atualiza resumo simples na tela
+        const resumoEl = document.getElementById('resumo');
+        resumoEl.innerHTML = `
+          <p><strong>Última remada:</strong> ${data} · ${duracao} min · ${distancia.toFixed(2)} km · ${intensidade}</p>
+        `;
+
+        // Opcional: limpar campos (mantém data para facilitar)
+        document.getElementById('duracao').value = '';
+        document.getElementById('distancia').value = '';
+        document.getElementById('notas').value = '';
+
+        // Opcional: atualizar atleta no localStorage, se a API retornar pontuação/nível novo
+        if (salvo.atletaAtualizado) {
+          localStorage.setItem('atletaLogado', JSON.stringify(salvo.atletaAtualizado));
+        }
+      } catch (e) {
+        console.error('Erro ao registrar remada:', e);
+        showMsg('Erro de conexão ao registrar remada.', 'err');
+      }
+    }
+
+    // ao carregar a página
+    window.addEventListener('DOMContentLoaded', () => {
+      preencherUsuario();
+
+      // sugestão: preencher data de hoje automaticamente
+      const agora = new Date();
+      const hoje = `${agora.getFullYear()}-${String(agora.getMonth()+1).padStart(2,'0')}-${String(agora.getDate()).padStart(2,'0')}`;
+      document.getElementById('data').value = hoje;
+    });
+  </script>
+</body>
+</html>

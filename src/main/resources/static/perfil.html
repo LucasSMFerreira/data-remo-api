@@ -1,0 +1,93 @@
+<!-- perfil.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Perfil – Data-Remo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0a0e1a; color: #e0e6f0; min-height: 100vh; padding: 40px 20px; }
+    .container { max-width: 600px; margin: 0 auto; }
+    .back { color: #4fc3f7; text-decoration: none; font-size: 0.9rem; display: inline-block; margin-bottom: 24px; }
+    h1 { font-size: 1.8rem; color: #4fc3f7; margin-bottom: 24px; }
+    .search { display: flex; gap: 12px; margin-bottom: 32px; }
+    select { flex: 1; padding: 12px 16px; background: #1a2236; border: 1px solid #2a3a54; border-radius: 8px; color: #e0e6f0; font-size: 1rem; }
+    .btn { padding: 12px 24px; background: #4fc3f7; color: #0a0e1a; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+    .perfil-card { background: #1a2236; border-radius: 16px; padding: 28px; display: none; }
+    .perfil-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+    .perfil-nome { font-size: 1.6rem; font-weight: 800; }
+    .perfil-sub { color: #7a8fa6; margin-top: 4px; font-size: 0.9rem; }
+    .nivel-badge { background: #4fc3f7; color: #0a0e1a; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat { background: #0a0e1a; border-radius: 10px; padding: 16px; text-align: center; }
+    .stat-val { font-size: 1.5rem; font-weight: 800; color: #4fc3f7; }
+    .stat-lbl { font-size: 0.78rem; color: #7a8fa6; margin-top: 4px; text-transform: uppercase; }
+    .badges-titulo { font-size: 0.85rem; color: #7a8fa6; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+    .badges { display: flex; flex-wrap: wrap; gap: 8px; }
+    .badge { background: #2a3a54; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; }
+    .sem-badges { color: #7a8fa6; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="dashboard.html" class="back">← Voltar</a>
+    <h1>Perfil do Atleta</h1>
+    <div class="search">
+      <select id="select-atleta"></select>
+      <button class="btn" onclick="carregar()">Ver Perfil</button>
+    </div>
+    <div class="perfil-card" id="perfil">
+      <div class="perfil-header">
+        <div>
+          <div class="perfil-nome" id="p-nome"></div>
+          <div class="perfil-sub" id="p-sub"></div>
+        </div>
+        <span class="nivel-badge" id="p-nivel"></span>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-val" id="p-pontos"></div><div class="stat-lbl">Pontos</div></div>
+        <div class="stat"><div class="stat-val" id="p-treinos"></div><div class="stat-lbl">Treinos</div></div>
+        <div class="stat"><div class="stat-val" id="p-tempo"></div><div class="stat-lbl">Minutos</div></div>
+      </div>
+      <div class="badges-titulo">Conquistas</div>
+      <div class="badges" id="p-badges"></div>
+    </div>
+  </div>
+
+  <script>
+    const API = '';
+
+    async function carregarLista() {
+      const res = await fetch(`${API}/api/atletas`);
+      const atletas = await res.json();
+      const sel = document.getElementById('select-atleta');
+      sel.innerHTML = atletas.map(a => `<option value="${a.nome}">${a.nome}</option>`).join('');
+    }
+
+    async function carregar() {
+      const nome = document.getElementById('select-atleta').value;
+      const res = await fetch(`${API}/api/atletas`);
+      const atletas = await res.json();
+      const a = atletas.find(x => x.nome === nome);
+      if (!a) return;
+
+      document.getElementById('p-nome').textContent = a.nome;
+      document.getElementById('p-sub').textContent = `${a.modalidade} · ${a.plano} · ${a.idade} anos`;
+      document.getElementById('p-nivel').textContent = (a.nivel || '').replace(/_/g, ' ');
+      document.getElementById('p-pontos').textContent = (a.pontosTotais || 0).toFixed(1);
+      document.getElementById('p-treinos').textContent = a.totalTreinos;
+      document.getElementById('p-tempo').textContent = a.tempoTotalMinutos;
+
+      const badgesEl = document.getElementById('p-badges');
+      badgesEl.innerHTML = a.badges.length
+        ? a.badges.map(b => `<span class="badge">${b}</span>`).join('')
+        : '<span class="sem-badges">Nenhuma conquista ainda.</span>';
+
+      document.getElementById('perfil').style.display = 'block';
+    }
+
+    carregarLista();
+  </script>
+</body>
+</html>

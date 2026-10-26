@@ -17,6 +17,9 @@ public class TreinoController {
         this.treinoService = treinoService;
     }
 
+    @GetMapping("/atleta/{id}")
+    public java.util.List<Treino> historico(@PathVariable Long id) { return treinoService.historico(id); }
+
     @PostMapping
     public ResponseEntity<Treino> registrar(@RequestBody TreinoRequest request) {
         Treino salvo = treinoService.registrarTreino(request);
