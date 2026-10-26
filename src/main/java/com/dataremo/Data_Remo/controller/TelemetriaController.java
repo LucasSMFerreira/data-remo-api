@@ -20,6 +20,8 @@ public class TelemetriaController {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Conflito de evento; reenvie o mesmo pacote para confirmar.");
         }
     }
+    @GetMapping("/evento/{id}")
+    public TelemetriaResponse buscar(@PathVariable String id) { return service.buscar(id); }
     @GetMapping("/treino/{id}")
     public List<TelemetriaResponse> listar(@PathVariable Long id) { return service.listar(id); }
 }

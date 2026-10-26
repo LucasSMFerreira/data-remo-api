@@ -60,6 +60,11 @@ public class TelemetriaService {
         return medicoes.findTop50ByTreinoIdOrderByRecebidoEmDescEventoIdAsc(treinoId)
                 .stream().map(TelemetriaResponse::from).toList();
     }
+    @Transactional(readOnly = true)
+    public TelemetriaResponse buscar(String eventoId) {
+        return TelemetriaResponse.from(medicoes.findById(eventoId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Medição não encontrada.")));
+    }
     private boolean idValido(String s) { return s != null && s.matches("[A-Za-z0-9_-]{1,64}"); }
     private boolean faixa(Double n, double min, double max) { return n != null && Double.isFinite(n) && n >= min && n <= max; }
 }

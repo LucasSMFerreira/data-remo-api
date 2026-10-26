@@ -146,7 +146,7 @@
     <!-- ESQUECI A SENHA -->
     <div class="form-section" id="form-esqueci">
       <p style="color:#7a8fa6; font-size:0.88rem; margin-bottom:20px; line-height:1.6;">
-        Informe seu nome e o email cadastrado. Enviaremos as instruções para recuperar o acesso.
+        A recuperação por email ainda não está disponível neste protótipo. Nenhuma mensagem será enviada.
       </p>
       <div class="field"><label>Nome</label><input id="r-nome" type="text" placeholder="Seu nome cadastrado"/></div>
       <div class="field"><label>Email cadastrado</label><input id="r-email" type="email" placeholder="seu@email.com"/></div>
@@ -205,6 +205,8 @@
       if (!nome || !idade || !clube || !email || !senha || !senha2) {
         return showMsg('Preencha todos os campos.', 'err');
       }
+      if (!Number.isInteger(idade) || idade < 1 || idade > 120) return showMsg('Informe uma idade entre 1 e 120 anos.', 'err');
+      if (!document.getElementById('c-email').checkValidity()) return showMsg('Informe um email válido.', 'err');
       if (senha.length < 6) {
         return showMsg('A senha deve ter pelo menos 6 caracteres.', 'err');
       }

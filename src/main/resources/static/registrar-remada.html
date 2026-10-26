@@ -184,7 +184,7 @@
 
       <div class="field">
         <label>Notas sobre o treino (opcional)</label>
-        <input id="notas" type="text" placeholder="Ex: vento frontal, foco em cadência"/>
+        <input id="notas" maxlength="500" type="text" placeholder="Ex: vento frontal, foco em cadência"/>
       </div>
 
       <button class="btn" onclick="registrarRemada()">
@@ -245,13 +245,13 @@
       }
 
       const data       = document.getElementById('data').value;
-      const duracao    = parseInt(document.getElementById('duracao').value);
+      const duracao    = Number(document.getElementById('duracao').value);
       const distancia  = parseFloat(document.getElementById('distancia').value);
       const intensidade= document.getElementById('intensidade').value;
       const tipo       = document.getElementById('tipo').value;
       const notas      = document.getElementById('notas').value.trim();
 
-      if (!data || !Number.isFinite(duracao) || duracao <= 0 || !Number.isFinite(distancia) || distancia <= 0) {
+      if (!data || !Number.isInteger(duracao) || duracao <= 0 || !Number.isFinite(distancia) || distancia <= 0) {
         showMsg('Informe data, duração e distância maiores que zero.', 'err');
         return;
       }
@@ -276,7 +276,7 @@
         if (!res.ok) {
           const txt = await res.text();
           console.error('Erro ao registrar remada:', res.status, txt);
-          showMsg('Erro ao registrar remada. Veja o console.', 'err');
+          showMsg(res.status === 400 ? 'Revise data, duração inteira, distância, intensidade, tipo e notas (até 500 caracteres).' : 'Não foi possível salvar. Confira se o atleta existe e tente novamente.', 'err');
           return;
         }
 
@@ -311,7 +311,8 @@
       preencherUsuario();
 
       // sugestão: preencher data de hoje automaticamente
-      const hoje = new Date().toISOString().split('T')[0];
+      const agora = new Date();
+      const hoje = `${agora.getFullYear()}-${String(agora.getMonth()+1).padStart(2,'0')}-${String(agora.getDate()).padStart(2,'0')}`;
       document.getElementById('data').value = hoje;
     });
   </script>

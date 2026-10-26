@@ -75,3 +75,7 @@ Trabalhamos na branch `feature/consolidar-web-backend`. Mantenha o firmware no m
 - Navegador: estado vazio, cinco envios do script, mais cinco do botão e persistência após reiniciar API/PostgreSQL confirmados. Sem erros no console na inspeção final.
 - Firmware: arquivo preparado e revisado; sem compilação para placa nem teste físico nesta sessão. O ambiente não tem `arduino-cli` disponível.
 - A API permaneceu acessível somente no computador (`127.0.0.1`); nenhuma regra de firewall foi alterada.
+
+## Conferir e repetir pela aplicação
+
+A tela permite conferir o último envio por leitura de cada evento na API, reenviar o mesmo lote sem duplicação e baixar as últimas 50 medições em JSON. `GET /api/telemetria/evento/{id}` retorna uma medição por identificador. Veja [a validação ponta a ponta](../docs/VALIDACAO-SIMULACAO.md) para o roteiro e os resultados mais recentes (37 verificações funcionais, 21 de telemetria e 1 teste Spring).

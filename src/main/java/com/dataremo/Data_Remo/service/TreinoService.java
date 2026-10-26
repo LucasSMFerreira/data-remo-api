@@ -32,8 +32,14 @@ public class TreinoService {
         if (req.getAtletaId() == null || req.getData() == null || req.getDuracaoMinutos() == null || req.getDuracaoMinutos() <= 0 || req.getDistanciaKm() == null || !Double.isFinite(req.getDistanciaKm()) || req.getDistanciaKm() <= 0) {
             throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, "Informe data, duracao e distancia positivas");
         }
+        if (req.getIntensidade() == null || !java.util.Set.of("LEVE", "MODERADA", "INTENSA").contains(req.getIntensidade())
+                || req.getTipo() == null || !java.util.Set.of("BASE", "INTERVALADO", "PROVA").contains(req.getTipo())
+                || (req.getNotas() != null && req.getNotas().length() > 500)) {
+            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST,
+                    "Selecione intensidade e tipo válidos; notas têm limite de 500 caracteres.");
+        }
         Atleta atleta = atletaRepository.findById(req.getAtletaId())
-                .orElseThrow(() -> new IllegalArgumentException("Atleta não encontrado"));
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND, "Atleta não encontrado"));
 
         double pontos = calcularPontos(req);
 

@@ -27,6 +27,12 @@ name='Teste API '+uuid.uuid4().hex[:8]
 body={'nome':name,'email':uuid.uuid4().hex+'@example.invalid','senha':'Ficticia2026!','idade':24,'modalidade':'Remo','plano':'FREE'}
 a=request('/api/atletas',body)
 check('Cadastro sem expor senha','senha' not in a and a['totalTreinos']==0 and a['pontosTotais']==0)
+for field,value in [('email','invalido'),('idade',-1),('senha','123')]:
+    request('/api/atletas',dict(body,**{field:value}),400)
+    check('Cadastro invalido recusado: '+field,True)
+malicious=dict(body,nome=name+' outro',email=uuid.uuid4().hex+'@example.invalid',id=a['id'],pontosTotais=99999,totalTreinos=999)
+clean=request('/api/atletas',malicious)
+check('Cadastro inicia com acumulados zerados',clean['id']!=a['id'] and clean['pontosTotais']==0 and clean['totalTreinos']==0)
 request('/api/atletas',body,409);check('Cadastro duplicado recusado',True)
 request('/api/atletas',{'nome':'Incompleto'},400);check('Cadastro incompleto recusado',True)
 request('/api/atletas/login',{'nome':name,'senha':'errada'},401);check('Senha incorreta recusada',True)
@@ -34,9 +40,11 @@ check('Login correto',request('/api/atletas/login',{'nome':name,'senha':body['se
 path='/api/treinos/atleta/'+str(a['id'])
 check('Histórico inicialmente vazio',request(path)==[])
 t={'atletaId':a['id'],'data':'2026-10-26','duracaoMinutos':30,'distanciaKm':5,'intensidade':'MODERADA','tipo':'BASE','notas':'Teste automático fictício'}
-for field,value in [('duracaoMinutos',-1),('distanciaKm',0),('atletaId',None)]:
+for field,value in [('duracaoMinutos',-1),('distanciaKm',0),('atletaId',None),('tipo',None),('intensidade','INVALIDA'),('notas','x'*501)]:
     request('/api/treinos',dict(t,**{field:value}),400)
     check('Treino inválido recusado: '+field,True)
+request('/api/treinos',dict(t,atletaId=9223372036854775807),404)
+check('Atleta inexistente retorna 404',True)
 check('Treinos inválidos não alteram histórico',request(path)==[])
 for i in range(5):
     saved=request('/api/treinos',dict(t,data='2026-10-%02d'%(22+i)))
