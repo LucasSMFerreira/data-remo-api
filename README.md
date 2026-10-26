@@ -117,3 +117,7 @@ python scripts/test-functional.py
 ```
 
 O teste cria atletas fictícios únicos e verifica os fluxos HTTP, pontuação, níveis e histórico. Os registros permanecem no banco local.
+
+## Telemetria fictícia do ESP32
+
+Esta branch inclui `POST /api/telemetria`, `GET /api/telemetria/treino/{id}` e a tela `/telemetria.html`, acessível pelo painel. As medições fictícias são persistidas no PostgreSQL e não alteram a pontuação do treino. Veja [hardware/README.md](hardware/README.md) para o contrato, envio pelo computador, configuração do sketch e limites do protótipo.
