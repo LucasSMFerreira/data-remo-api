@@ -1,0 +1,129 @@
+<!-- ranking.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ranking – Data-Remo</title>
+  <script src="js/vendor/chart.umd.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0a0e1a;
+      color: #e0e6f0;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    .container { max-width: 760px; margin: 0 auto; }
+    .back { color: #4fc3f7; text-decoration: none; font-size: 0.9rem; display: inline-block; margin-bottom: 24px; }
+    h1 { font-size: 1.8rem; color: #4fc3f7; margin-bottom: 32px; }
+    .chart-box { background: #1a2236; border-radius: 16px; padding: 24px; margin-bottom: 32px; }
+    .rank-list { display: flex; flex-direction: column; gap: 12px; }
+    .rank-item {
+      background: #1a2236; border-radius: 12px; padding: 16px 20px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .pos { font-size: 1.4rem; font-weight: 800; width: 36px; color: #4fc3f7; }
+    .pos.gold { color: #ffd700; }
+    .pos.silver { color: #c0c0c0; }
+    .pos.bronze { color: #cd7f32; }
+    .info { flex: 1; }
+    .nome { font-weight: 700; font-size: 1rem; }
+    .detalhe { font-size: 0.82rem; color: #7a8fa6; margin-top: 2px; }
+    .pontos { font-size: 1.1rem; font-weight: 700; color: #4fc3f7; }
+    .vazio { color: #7a8fa6; text-align: center; padding: 32px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="dashboard.html" class="back">← Voltar</a>
+    <h1>🏆 Ranking Geral</h1>
+    <div class="chart-box">
+      <canvas id="grafico" height="120"></canvas>
+    </div>
+    <div class="rank-list" id="ranking"></div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script>
+    const posClasses = ['gold', 'silver', 'bronze'];
+
+    function formatarNivel(nivel) {
+      if (!nivel) return '';
+      return nivel.replace(/_/g, ' ');
+    }
+
+    async function carregar() {
+      const lista = document.getElementById('ranking');
+      try {
+        const res = await fetch(`${API}/api/atletas/ranking`);
+        if (!res.ok) {
+          const txt = await res.text();
+          console.error('Erro ranking backend:', res.status, txt);
+          throw new Error('Falha ao carregar ranking');
+        }
+
+        const atletas = await res.json();
+
+        if (!atletas.length) {
+          lista.innerHTML = '<div class="vazio">Nenhum atleta com pontuação no ranking ainda.</div>';
+          return;
+        }
+
+        lista.innerHTML = atletas.map((a, i) => {
+          const pontos = a.pontosTotais ?? 0;
+          const treinos = a.totalTreinos ?? 0;
+          const tempo = a.tempoTotalMinutos ?? 0;
+
+          return `
+          <div class="rank-item">
+            <div class="pos ${posClasses[i] || ''}">${i + 1}º</div>
+            <div class="info">
+              <div class="nome">${a.nome}</div>
+              <div class="detalhe">
+                ${formatarNivel(a.nivel)} · ${treinos} treinos · ${tempo} min
+              </div>
+            </div>
+            <div class="pontos">${pontos.toFixed(1)} pts</div>
+          </div>`;
+        }).join('');
+
+        // gráfico
+        const labels = atletas.map(a => a.nome);
+        const dadosPontos = atletas.map(a => a.pontosTotais ?? 0);
+
+        new Chart(document.getElementById('grafico'), {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [{
+              label: 'Pontos',
+              data: dadosPontos,
+              backgroundColor: dadosPontos.map((_, i) =>
+                i === 0 ? '#ffd700' :
+                i === 1 ? '#c0c0c0' :
+                i === 2 ? '#cd7f32' : '#4fc3f7'
+              ),
+              borderRadius: 8
+            }]
+          },
+          options: {
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { ticks: { color: '#7a8fa6' }, grid: { color: '#1a2236' } },
+              y: { ticks: { color: '#7a8fa6' }, grid: { color: '#2a3a54' } }
+            }
+          }
+        });
+
+      } catch (e) {
+        console.error(e);
+        lista.innerHTML = '<div class="vazio">Erro ao carregar ranking.</div>';
+      }
+    }
+
+    carregar();
+  </script>
+</body>
+</html>

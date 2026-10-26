@@ -13,7 +13,7 @@ Protótipo acadêmico em Java para cadastrar atletas, registrar treinos e remada
 
 ## Estado atual
 
-O repositório contém o backend e um ponto de entrada de console. Não inclui uma interface web nem configuração de banco pronta para uso. A execução depende de preparar um PostgreSQL local e validar a inicialização do esquema.
+Esta branch reúne o backend, a interface HTML/JavaScript e um ponto de entrada de console. O Spring Boot serve a interface em `/`. A execução depende de preparar um PostgreSQL local e configurar a conexão por variáveis de ambiente.
 
 É um projeto em evolução: a documentação descreve o código disponível, sem afirmar validação de execução ou cobertura funcional completa.
 
@@ -41,7 +41,7 @@ Requisitos: **JDK 21**, Git e PostgreSQL. O Maven Wrapper está incluído; o pri
 
 ```powershell
 git clone https://github.com/LucasSMFerreira/Data-Remo.git
-cd Data-Remo
+cd data-remo-api
 java -version
 ```
 
@@ -94,7 +94,7 @@ O teste versionado atualmente verifica o carregamento do contexto. Ele não comp
 
 ## Limites e próximas melhorias
 
-1. Substituir comparação direta de senhas por hash e separar entidades de respostas HTTP: o modelo atual expõe um getter de senha e os controllers retornam entidades.
+1. Novos cadastros usam hash PBKDF2 e a senha não é retornada no JSON. Contas antigas com senha em texto precisam de migração antes de reutilização. Separar entidades de respostas HTTP continua pendente.
 2. Implementar autenticação e autorização das rotas antes de qualquer exposição pública da aplicação.
 3. Versionar migrações e garantir inicialização em banco vazio.
 4. Adicionar validação de entrada, tratamento consistente de erros e testes de serviços e endpoints.
@@ -105,3 +105,15 @@ Use somente dados fictícios e senhas descartáveis no ambiente local. Publicar 
 ## Licença
 
 Este repositório ainda não contém uma licença de uso explícita.
+
+## Interface consolidada
+
+Abra `http://127.0.0.1:8080/`. Cadastro, login, painel, registro de treino, histórico, perfil e ranking usam a API da mesma origem. O gráfico é servido localmente. Recuperação de senha por email ainda não está implementada. O login atual não estabelece uma sessão autorizada no servidor; use apenas um ambiente local com dados fictícios.
+
+Teste funcional reproduzível (Python 3, API e banco em execução):
+
+```powershell
+python scripts/test-functional.py
+```
+
+O teste cria atletas fictícios únicos e verifica os fluxos HTTP, pontuação, níveis e histórico. Os registros permanecem no banco local.

@@ -22,8 +22,16 @@ public class TreinoService {
         this.atletaRepository = atletaRepository;
     }
 
+    @Transactional(readOnly = true)
+    public java.util.List<Treino> historico(Long id) {
+        return treinoRepository.findByAtletaIdOrderByDataDescIdDesc(id);
+    }
+
     @Transactional
     public Treino registrarTreino(TreinoRequest req) {
+        if (req.getAtletaId() == null || req.getData() == null || req.getDuracaoMinutos() == null || req.getDuracaoMinutos() <= 0 || req.getDistanciaKm() == null || !Double.isFinite(req.getDistanciaKm()) || req.getDistanciaKm() <= 0) {
+            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, "Informe data, duracao e distancia positivas");
+        }
         Atleta atleta = atletaRepository.findById(req.getAtletaId())
                 .orElseThrow(() -> new IllegalArgumentException("Atleta não encontrado"));
 

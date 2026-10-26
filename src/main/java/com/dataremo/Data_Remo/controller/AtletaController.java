@@ -54,6 +54,7 @@ public class AtletaController {
         if (atleta.getTempoTotalMinutos() == null) atleta.setTempoTotalMinutos(0);
         if (atleta.getNivel() == null) atleta.setNivel(Nivel.INICIANTE_1);
 
+        atleta.setSenha(com.dataremo.Data_Remo.service.SenhaLocal.hash(atleta.getSenha()));
         try {
             Atleta salvo = atletaRepository.save(atleta);
             return ResponseEntity.ok(salvo);
@@ -66,6 +67,11 @@ public class AtletaController {
             e.printStackTrace();
             return ResponseEntity.status(500).body("Erro ao criar atleta.");
         }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Atleta> buscar(@PathVariable Long id) {
+        return atletaRepository.findById(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // ranking geral (ordenado por pontos)
@@ -89,7 +95,7 @@ public class AtletaController {
 
         Atleta atleta = atletaRepository.findByNome(nome);
 
-        if (atleta == null || atleta.getSenha() == null || !atleta.getSenha().equals(senha)) {
+        if (atleta == null || atleta.getSenha() == null || !com.dataremo.Data_Remo.service.SenhaLocal.confere(senha, atleta.getSenha())) {
             return ResponseEntity.status(401).body("Nome ou senha incorretos.");
         }
 

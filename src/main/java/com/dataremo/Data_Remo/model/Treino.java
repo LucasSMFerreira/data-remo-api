@@ -14,6 +14,7 @@ public class Treino {
     // relação com Atleta
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "atleta_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Atleta atleta;
 
     @Column(nullable = false)
